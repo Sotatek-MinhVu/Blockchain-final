@@ -116,17 +116,17 @@ import "./utils/SafeERC20.sol";
     /**
     * @notice burn tokens.
     */
-    function burn()
+    function burn(uint256 amount)
     public
     payable
     nonReentrant
-    checkWalletNotInCliffDuration(msg.sender)
+    checkWalletNotInCliffDuration(account)
     {
         uint256 amountburn = _balances[msg.sender];
-        require(amountburn > 0, "User not token");
-        _balances[msg.sender] = 0;
-        _token.safeTransferFrom(msg.sender, address(this), amountburn);
-        emit Transfer(msg.sender, address(this), amountburn);
+        require(amountburn > amount, "User not token");
+        _balances[msg.sender] = _balances[msg.sender].sub(amount);
+        _token.safeTransferFrom(msg.sender, address(this), amount);
+        emit Transfer(msg.sender, address(this), amount);
 
     }
 

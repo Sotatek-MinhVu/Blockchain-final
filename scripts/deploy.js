@@ -7,7 +7,7 @@ async function main() {
 
   const Token = await ethers.getContractFactory("Token");
   const token = await Token.deploy(
-    "Test Token Vesting",
+    "FixToken",
     "TV",
     "1000000000000000000000000"
   );
