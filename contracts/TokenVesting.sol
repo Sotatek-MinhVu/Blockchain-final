@@ -120,7 +120,6 @@ import "./utils/SafeERC20.sol";
     public
     payable
     nonReentrant
-    checkWalletNotInCliffDuration(account)
     {
         uint256 amountburn = _balances[msg.sender];
         require(amountburn > amount, "User not token");
