@@ -100,7 +100,6 @@ import "./utils/SafeERC20.sol";
     */
     function transferVestingToken(address recipient, uint256 amount)
     public
-    payable
     nonReentrant
     checkWalletNotInCliffDuration(msg.sender)
     checkWalletNotInCliffDuration(recipient)
@@ -118,13 +117,12 @@ import "./utils/SafeERC20.sol";
     */
     function burn(uint256 amount)
     public
-    payable
     nonReentrant
     {
         uint256 amountburn = _balances[msg.sender];
         require(amountburn > amount, "User not token");
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        _token.safeTransferFrom(msg.sender, address(this), amount);
+        _token.transferFrom(msg.sender, address(this), amount);
         emit Transfer(msg.sender, address(this), amount);
 
     }
@@ -299,8 +297,8 @@ import "./utils/SafeERC20.sol";
     * @dev Get balances token
     */
 
-    function getBalanceToken() public view returns(uint256) { 
-      return _token.balanceOf(address(this));
+    function getBalanceToken(address account) public view returns(uint256) { 
+      return _token.balanceOf(account);
     }
 
  }
