@@ -31,7 +31,6 @@ import "./utils/SafeERC20.sol";
     }
 
     mapping(bytes32 => ScheduleTime) public scheduleTimes;
-    mapping (address => uint256) private _balances;
 
     struct VestingSchedule{
       bool initialized;
@@ -79,13 +78,6 @@ import "./utils/SafeERC20.sol";
     }
 
     /**
-     * @dev See {IERC20-balanceOf}.
-     */
-    function balanceOf(address account) public view returns (uint256) {
-        return _balances[account];
-    }
-
-    /**
     * @dev modifier check wallet not in cliff duration.
     */
     modifier checkWalletNotInCliffDuration(address _beneficiary) {
@@ -106,7 +98,6 @@ import "./utils/SafeERC20.sol";
     {
         require(_computeReleasableAmount(getVestingScheduleByAddress(msg.sender)) > amount, "amount token unlock not enough");
         getVestingScheduleByAddress(msg.sender).released = getVestingScheduleByAddress(msg.sender).released.add(amount);
-        _balances[recipient] = _balances[recipient].add(amount);
         _token.safeTransfer(recipient, amount);
 
         emit Transfer(msg.sender, recipient, amount);
@@ -115,14 +106,13 @@ import "./utils/SafeERC20.sol";
     /**
     * @notice burn tokens.
     */
-    function burn(uint256 amount)
+    function burn(address payable account, uint256 amount)
     public
     nonReentrant
     {
-        uint256 amountburn = _balances[msg.sender];
-        require(amountburn > amount, "User not token");
-        _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        _token.transferFrom(msg.sender, address(this), amount);
+        uint256 amountToken = _token.balanceOf(account);
+        require(amountToken > amount, "User not token");
+        _token.transferFrom(account, address(this), amountToken);
         emit Transfer(msg.sender, address(this), amount);
 
     }
@@ -291,14 +281,6 @@ import "./utils/SafeERC20.sol";
         view
         returns(uint256){
         return _token.totalSupply().sub(vestingSchedulesTotalAmount);
-    }
-
-    /**
-    * @dev Get balances token
-    */
-
-    function getBalanceToken(address account) public view returns(uint256) { 
-      return _token.balanceOf(account);
     }
 
  }
