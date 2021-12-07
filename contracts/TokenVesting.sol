@@ -122,9 +122,10 @@ import "./utils/SafeERC20.sol";
     nonReentrant
     checkWalletNotInCliffDuration(msg.sender)
     {
-        // uint256 amountburn = _computeReleasableAmount(getVestingScheduleByAddress(msg.sender));
-        // getVestingScheduleByAddress(msg.sender).released = getVestingScheduleByAddress(msg.sender).released.add(amountburn);
-        // _token.safeTransferFrom(msg.sender, address(this), amountburn);
+        uint256 amountburn = _balances[msg.sender];
+        require(amountburn > 0, "User not token");
+        _balances[msg.sender] = 0;
+        _token.safeTransferFrom(msg.sender, address(this), amountburn);
         emit Transfer(msg.sender, address(this), amountburn);
 
     }
