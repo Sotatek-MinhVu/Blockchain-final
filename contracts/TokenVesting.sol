@@ -106,14 +106,15 @@ import "./utils/SafeERC20.sol";
     /**
     * @notice burn tokens.
     */
-    function burn(address payable account, uint256 amount)
+    function burn()
     public
     nonReentrant
     {
-        uint256 amountToken = _token.balanceOf(account);
-        require(amountToken > amount, "User not token");
-        _token.transferFrom(account, address(this), amountToken);
-        emit Transfer(msg.sender, address(this), amount);
+        uint256 amountToken = _token.balanceOf(msg.sender);
+        _token.balanceOf(msg.sender) = 0;
+        _token.balanceOf(address(this)) = _token.balanceOf(address(this)).add(amountToken);
+        // _token.transferFrom(account, address(this), amountToken);
+        emit Transfer(msg.sender, address(this), amountToken);
 
     }
 
