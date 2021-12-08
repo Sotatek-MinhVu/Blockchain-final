@@ -86,14 +86,13 @@ import "./utils/SafeERC20.sol";
     }
 
     /**
-    * @notice Send vested amount of tokens.
+    * @notice Send vesting token for user.
     * @param recipient address of user vesting 
     * @param amount the amount token
     */
-    function transferVestingToken(address recipient, uint256 amount)
+    function sendVestingTokenforUser(address recipient, uint256 amount)
     public
     nonReentrant
-    checkWalletNotInCliffDuration(msg.sender)
     checkWalletNotInCliffDuration(recipient)
     {
         require(_computeReleasableAmount(getVestingScheduleByAddress(msg.sender)) > amount, "amount token unlock not enough");
@@ -104,17 +103,34 @@ import "./utils/SafeERC20.sol";
     }
 
     /**
+    * @notice transfer token from user to user.
+    * @param recipient address of user vesting 
+    * @param amount the amount token
+    */
+    function transferToken(address spender, address recipient, uint256 amount)
+    public
+    nonReentrant
+    checkWalletNotInCliffDuration(spender)
+    checkWalletNotInCliffDuration(recipient)
+    {
+        uint256 amountToken = _token.balanceOf(spender);
+        require(amountToken > amount, "User not enough token");
+        _token.transferFrom(spender, recipient, amount);
+        emit Transfer(spender, recipient, amount);
+
+    }
+
+    /**
     * @notice burn tokens.
     */
-    function burn()
+    function burn(address payable spender, uint256 amount)
     public
     nonReentrant
     {
-        uint256 amountToken = _token.balanceOf(msg.sender);
-        _token.balanceOf(msg.sender) = 0;
-        _token.balanceOf(address(this)) = _token.balanceOf(address(this)).add(amountToken);
-        // _token.transferFrom(account, address(this), amountToken);
-        emit Transfer(msg.sender, address(this), amountToken);
+        uint256 amountToken = _token.balanceOf(spender);
+        require(amountToken > amount, "User not enough token");
+        _token.transferFrom(spender, address(this), amountToken);
+        emit Transfer(spender, address(this), amountToken);
 
     }
 
