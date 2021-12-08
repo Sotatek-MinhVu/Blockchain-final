@@ -56,7 +56,7 @@ import "./utils/SafeERC20.sol";
     mapping(bytes32 => VestingSchedule) private vestingSchedules;
     uint256 private vestingSchedulesTotalAmount;
 
-    event Released(uint256 amount);
+    event Released(address recipient, uint256 amount);
     event Transfer(address, address recipient, uint256 amount);
     event Revoked();
 
@@ -101,6 +101,7 @@ import "./utils/SafeERC20.sol";
         _token.safeTransfer(recipient, amount);
 
         emit Transfer(msg.sender, recipient, amount);
+        emit Released(recipient, amount);
     }
 
     /**
