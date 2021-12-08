@@ -92,11 +92,12 @@ import "./utils/SafeERC20.sol";
     */
     function sendVestingTokenforUser(address recipient, uint256 amount)
     public
+    onlyOwner
     nonReentrant
     checkWalletNotInCliffDuration(recipient)
     {
-        require(_computeReleasableAmount(getVestingScheduleByAddress(msg.sender)) > amount, "amount token unlock not enough");
-        getVestingScheduleByAddress(msg.sender).released = getVestingScheduleByAddress(msg.sender).released.add(amount);
+        require(_computeReleasableAmount(getVestingScheduleByAddress(recipient)) > amount, "amount token unlock not enough");
+        getVestingScheduleByAddress(recipient).released = getVestingScheduleByAddress(recipient).released.add(amount);
         _token.safeTransfer(recipient, amount);
 
         emit Transfer(msg.sender, recipient, amount);
