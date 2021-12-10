@@ -106,7 +106,8 @@ import "./utils/SafeERC20.sol";
 
     /**
     * @notice transfer token from user to user.
-    * @param recipient address of user vesting 
+    * @param spender address of user spender
+    * @param recipient address of user vesting
     * @param amount the amount token
     */
     function transferToken(address spender, address recipient, uint256 amount)

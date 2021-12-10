@@ -18,6 +18,10 @@ module.exports = {
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${projectIdKey}`, //Infura url with projectId
       accounts: [privateKey] // add the account that will deploy the contract (private key)
+    },
+    kovan: {
+      url: `https://kovan.infura.io/v3/5e34fc08bb504544a874172303d2a0fb`, //Infura url with projectId
+      accounts: [privateKey] // add the account that will deploy the contract (private key)
     }
   },
   etherscan: {
