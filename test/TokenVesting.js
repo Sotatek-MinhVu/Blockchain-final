@@ -41,32 +41,27 @@ describe("TokenVesting", function () {
       );
       expect(vestingContractBalance).to.equal(1000);
       expect(await tokenVesting.getWithdrawableAmount()).to.equal(1000);
+      let team = keccak256("PRIVATE")
+      expect(await tokenVesting.PRIVATE).to.equal(team);
 
-      const baseTime = 1622551248;
       const beneficiary = addr1;
-      const startTime = baseTime;
-      const cliff = 0;
-      const duration = 1000;
-      const slicePeriodSeconds = 1;
-      const revokable = true;
+      const _team = team;
+      const _revocable = true;
       const amount = 100;
 
       // create new vesting schedule
-      // await tokenVesting.createVestingSchedule(
-      //   beneficiary.address,
-      //   startTime,
-      //   cliff,
-      //   duration,
-      //   slicePeriodSeconds,
-      //   revokable,
-      //   amount
-      // );
-      // expect(await tokenVesting.getVestingSchedulesCount()).to.be.equal(1);
-      // expect(
-      //   await tokenVesting.getVestingSchedulesCountByBeneficiary(
-      //     beneficiary.address
-      //   )
-      // ).to.be.equal(1);
+      await tokenVesting.createVestingSchedule(
+        beneficiary.address,
+        _team,
+        _revocable,
+        amount
+      );
+      expect(await tokenVesting.getVestingSchedulesCount()).to.be.equal(1);
+      expect(
+        await tokenVesting.getVestingSchedulesCountByBeneficiary(
+          beneficiary.address
+        )
+      ).to.be.equal(1);
 
       // compute vesting schedule
       const vestingSchedule =
