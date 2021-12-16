@@ -52,74 +52,73 @@ describe("TokenVesting", function () {
       const amount = 100;
 
       // create new vesting schedule
-      await tokenVesting.createVestingSchedule(
-        beneficiary.address,
-        startTime,
-        cliff,
-        duration,
-        slicePeriodSeconds,
-        revokable,
-        amount
-      );
-      expect(await tokenVesting.getVestingSchedulesCount()).to.be.equal(1);
-      expect(
-        await tokenVesting.getVestingSchedulesCountByBeneficiary(
-          beneficiary.address
-        )
-      ).to.be.equal(1);
+      // await tokenVesting.createVestingSchedule(
+      //   beneficiary.address,
+      //   startTime,
+      //   cliff,
+      //   duration,
+      //   slicePeriodSeconds,
+      //   revokable,
+      //   amount
+      // );
+      // expect(await tokenVesting.getVestingSchedulesCount()).to.be.equal(1);
+      // expect(
+      //   await tokenVesting.getVestingSchedulesCountByBeneficiary(
+      //     beneficiary.address
+      //   )
+      // ).to.be.equal(1);
 
-      // compute vesting schedule id
-      const vestingScheduleId =
-        await tokenVesting.computeVestingScheduleIdForAddressAndIndex(
-          beneficiary.address,
-          0
+      // compute vesting schedule
+      const vestingSchedule =
+        await tokenVesting.getVestingScheduleByAddress(
+          beneficiary.address
         );
 
       // check that vested amount is 0
       expect(
-        await tokenVesting.computeReleasableAmount(vestingScheduleId)
+        await tokenVesting.computeReleasableAmount(vestingSchedule)
       ).to.be.equal(0);
 
       // set time to half the vesting period
-      const halfTime = baseTime + duration / 2;
-      await tokenVesting.setCurrentTime(halfTime);
+      // const halfTime = baseTime + duration / 2;
+      // await tokenVesting.setCurrentTime(halfTime);
 
       // check that vested amount is half the total amount to vest
       expect(
         await tokenVesting
           .connect(beneficiary)
-          .computeReleasableAmount(vestingScheduleId)
+          .computeReleasableAmount(vestingSchedule)
       ).to.be.equal(50);
 
       // check that only beneficiary can try to release vested tokens
-      await expect(
-        tokenVesting.connect(addr2).release(vestingScheduleId, 100)
-      ).to.be.revertedWith(
-        "TokenVesting: only beneficiary and owner can release vested tokens"
-      );
+      // await expect(
+      //   tokenVesting.connect(addr2).release(vestingSchedule, 100)
+      // ).to.be.revertedWith(
+      //   "TokenVesting: only beneficiary and owner can release vested tokens"
+      // );
 
       // check that beneficiary cannot release more than the vested amount
-      await expect(
-        tokenVesting.connect(beneficiary).release(vestingScheduleId, 100)
-      ).to.be.revertedWith(
-        "TokenVesting: cannot release tokens, not enough vested tokens"
-      );
+      // await expect(
+      //   tokenVesting.connect(beneficiary).release(vestingSchedule, 100)
+      // ).to.be.revertedWith(
+      //   "TokenVesting: cannot release tokens, not enough vested tokens"
+      // );
 
-      // release 10 tokens and check that a Transfer event is emitted with a value of 10
-      await expect(
-        tokenVesting.connect(beneficiary).release(vestingScheduleId, 10)
-      )
-        .to.emit(testToken, "Transfer")
-        .withArgs(tokenVesting.address, beneficiary.address, 10);
+      // // release 10 tokens and check that a Transfer event is emitted with a value of 10
+      // await expect(
+      //   tokenVesting.connect(beneficiary).release(vestingScheduleId, 10)
+      // )
+      //   .to.emit(testToken, "Transfer")
+      //   .withArgs(tokenVesting.address, beneficiary.address, 10);
 
       // check that the vested amount is now 40
       expect(
         await tokenVesting
           .connect(beneficiary)
-          .computeReleasableAmount(vestingScheduleId)
+          ._computeReleasableAmount(vestingSchedule)
       ).to.be.equal(40);
-      let vestingSchedule = await tokenVesting.getVestingSchedule(
-        vestingScheduleId
+      let vestingSchedule = await tokenVesting.getVestingScheduleByAddress(
+        beneficiary
       );
 
       // check that the released amount is 10
@@ -132,18 +131,18 @@ describe("TokenVesting", function () {
       expect(
         await tokenVesting
           .connect(beneficiary)
-          .computeReleasableAmount(vestingScheduleId)
+          ._computeReleasableAmount(vestingSchedule)
       ).to.be.equal(90);
 
       // beneficiary release vested tokens (45)
       await expect(
-        tokenVesting.connect(beneficiary).release(vestingScheduleId, 45)
+        tokenVesting.connect(beneficiary).release(vestingSchedule, 45)
       )
         .to.emit(testToken, "Transfer")
         .withArgs(tokenVesting.address, beneficiary.address, 45);
 
       // owner release vested tokens (45)
-      await expect(tokenVesting.connect(owner).release(vestingScheduleId, 45))
+      await expect(tokenVesting.connect(owner).release(vestingSchedule, 45))
         .to.emit(testToken, "Transfer")
         .withArgs(tokenVesting.address, beneficiary.address, 45);
       vestingSchedule = await tokenVesting.getVestingSchedule(
@@ -157,14 +156,14 @@ describe("TokenVesting", function () {
       expect(
         await tokenVesting
           .connect(beneficiary)
-          .computeReleasableAmount(vestingScheduleId)
+          ._computeReleasableAmount(vestingSchedule)
       ).to.be.equal(0);
 
       // check that anyone cannot revoke a vesting
       await expect(
-        tokenVesting.connect(addr2).revoke(vestingScheduleId)
+        tokenVesting.connect(addr2).revoke(vestingSchedule)
       ).to.be.revertedWith(" Ownable: caller is not the owner");
-      await tokenVesting.revoke(vestingScheduleId);
+      await tokenVesting.revoke(vestingSchedule);
 
       /*
        * TEST SUMMARY
