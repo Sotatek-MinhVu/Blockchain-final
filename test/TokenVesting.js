@@ -219,11 +219,10 @@ describe("TokenVesting", function () {
         amount
       );
 
-      // compute vesting schedule id
+      // compute vesting schedule
       const vestingScheduleId =
-        await tokenVesting.computeVestingScheduleIdForAddressAndIndex(
-          beneficiary.address,
-          0
+        await tokenVesting.computeVestingScheduleIdForAddress(
+          beneficiary.address
         );
 
       // set time to half the vesting period
@@ -242,15 +241,7 @@ describe("TokenVesting", function () {
         "0xa279197a1d7a4b7398aa0248e95b8fcc6cdfb43220ade05d01add9c5468ea097";
       expect(
         (
-          await tokenVesting.computeVestingScheduleIdForAddressAndIndex(
-            addr1.address,
-            0
-          )
-        ).toString()
-      ).to.equal(expectedVestingScheduleId);
-      expect(
-        (
-          await tokenVesting.computeNextVestingScheduleIdForHolder(
+          await tokenVesting.computeVestingScheduleIdForAddress(
             addr1.address
           )
         ).toString()
